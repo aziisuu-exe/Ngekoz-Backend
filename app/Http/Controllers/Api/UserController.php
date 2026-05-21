@@ -35,12 +35,29 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $user->update([
-            'full_name' => $request->full_name ?? $user->full_name,
-            'phone_number' => $request->phone_number ?? $user->phone_number,
-            'bio' => $request->bio ?? $user->bio,
-            'role' => $request->role ?? $user->role,
-        ]);
+        $data = [];
+
+        if ($request->filled('full_name')) $data['full_name'] = $request->full_name;
+        if ($request->filled('username')) $data['username'] = $request->username;
+        if ($request->filled('email')) $data['email'] = $request->email;
+        if ($request->filled('phone_number')) $data['phone_number'] = $request->phone_number;
+        if ($request->filled('bio')) $data['bio'] = $request->bio;
+        if ($request->filled('role')) $data['role'] = $request->role;
+
+        if ($request->filled('password')) {
+            $data['password'] = bcrypt($request->password);
+        }
+
+        if ($request->hasFile('profile_picture')) {
+            Configuration::instance(env('CLOUDINARY_URL'));
+            $upload = new UploadApi();
+            $result = $upload->upload($request->file('profile_picture')->getRealPath(), [
+                'folder' => 'ngekoz_profiles'
+            ]);
+            $data['profile_picture'] = $result['secure_url'];
+        }
+
+        $user->update($data);
 
         return response()->json([
             'success' => true,
