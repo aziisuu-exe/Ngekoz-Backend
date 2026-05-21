@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
-
     public function getCities(Request $request)
     {
         $query = City::withCount('districts'); 
@@ -20,7 +19,8 @@ class LocationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $query->orderBy('id', 'asc')->paginate(10)
+            // Mengubah paginate menjadi get() agar semua data dikirim ke frontend
+            'data' => $query->orderBy('id', 'asc')->get()
         ]);
     }
 
@@ -34,7 +34,8 @@ class LocationController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $query->orderBy('id', 'asc')->paginate(10)
+            // Mengubah paginate menjadi get() agar semua data dikirim ke frontend
+            'data' => $query->orderBy('id', 'asc')->get()
         ]);
     }
 
@@ -50,34 +51,6 @@ class LocationController extends Controller
             'success' => true,
             'message' => 'Kota berhasil ditambahkan',
             'data' => $city
-        ]);
-    }
-
-    public function updateCity(Request $request, $id)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:cities,name,' . $id
-        ]);
-
-        $city = City::findOrFail($id);
-        $city->update(['name' => $request->name]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Kota berhasil diperbarui',
-            'data' => $city
-        ]);
-    }
-
-    public function destroyCity($id)
-    {
-        $city = City::findOrFail($id); 
-        // if ($city->districts()->count() > 0)
-        $city->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Kota berhasil dihapus'
         ]);
     }
 
@@ -138,5 +111,4 @@ class LocationController extends Controller
             'message' => 'Kecamatan berhasil dihapus'
         ]);
     }
-
 }
