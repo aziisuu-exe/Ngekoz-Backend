@@ -18,7 +18,7 @@ class FacilityController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $query->orderBy('id', 'asc')->paginate(10)
+            'data' => $query->orderBy('id', 'asc')->get()
         ]);
     }
 
